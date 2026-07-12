@@ -1,0 +1,325 @@
+:root {
+  --bg-color: #000000;
+  --card-bg: #0a0a0a;
+  --border-color: #1f1f1f;
+  --text-main: #e0e0e0;
+  --text-muted: #888;
+  --accent-blue: #3b82f6;
+  --accent-green: #22c55e;
+  --accent-red: #ef4444;
+  --font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* --- Layout --- */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding-bottom: 80px;
+}
+
+/* --- Components --- */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.card:hover {
+  border-color: #333;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+h2 {
+  font-size: 1.2rem;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  transition: opacity 0.2s;
+}
+button:active {
+  opacity: 0.7;
+}
+
+.btn {
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  background: #222;
+  color: #fff;
+  border: 1px solid #333;
+}
+.btn-primary {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: #000;
+}
+.btn-success {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+  color: #000;
+}
+.btn-danger {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+  color: #fff;
+}
+
+.fs-btn {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 0;
+  line-height: 1;
+}
+.fs-btn:hover {
+  color: #fff;
+}
+
+input,
+textarea {
+  background: #111;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  width: 100%;
+  font-family: inherit;
+  outline: none;
+}
+input:focus,
+textarea:focus {
+  border-color: var(--accent-blue);
+}
+
+/* --- Header & Clock --- */
+header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.clock-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+#digital-clock {
+  font-size: 2.5rem;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  line-height: 1;
+}
+.ampm {
+  font-size: 0.4em;
+  vertical-align: top;
+  margin-left: 5px;
+  opacity: 0.7;
+  font-weight: 400;
+}
+#date-display {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+.clock-toggle {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* --- Full Screen Overlays --- */
+.fs-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  z-index: 2000;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: default; /* Default cursor */
+  transition: cursor 0.5s ease;
+}
+
+/* State: When UI is hidden (Idle) */
+.fs-overlay.ui-hidden {
+  cursor: none; /* Hide cursor */
+}
+
+.fs-large-text {
+  font-size: 18vw;
+  font-weight: 700;
+  color: #e0e0e0;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+.fs-large-text.paused {
+  opacity: 0.4;
+  color: #888;
+}
+.fs-large-text .ampm {
+  font-size: 0.25em;
+  margin-left: 10px;
+  vertical-align: top;
+}
+
+.fs-hint {
+  color: #333;
+  margin-top: 20px;
+  font-size: 1rem;
+  opacity: 1;
+  transition: opacity 0.5s ease; /* Smooth fade for the text */
+}
+
+/* Hide hints when idle */
+.fs-overlay.ui-hidden .fs-hint {
+  opacity: 0;
+}
+
+/* --- Timer/Pomodoro --- */
+.timer-display {
+  font-size: 3.5rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  margin: 10px 0;
+  font-weight: 700;
+}
+.controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+}
+.presets {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+/* --- Stopwatch --- */
+.laps {
+  max-height: 150px;
+  overflow-y: auto;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  border-top: 1px solid #222;
+}
+.lap-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #111;
+  color: var(--text-muted);
+}
+
+/* --- To-Do --- */
+.todo-input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+.todo-list {
+  list-style: none;
+  max-height: 250px;
+  overflow-y: auto;
+}
+.todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background: #0f0f0f;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  border-left: 3px solid transparent;
+}
+.todo-item.completed {
+  opacity: 0.5;
+  text-decoration: line-through;
+  border-left-color: var(--accent-green);
+}
+.todo-item span {
+  flex-grow: 1;
+  margin-left: 10px;
+}
+.subject-tag {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  background: #222;
+  border-radius: 4px;
+  color: var(--accent-blue);
+  margin-right: 5px;
+}
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #222;
+  margin-top: 10px;
+  border-radius: 2px;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent-green);
+  width: 0%;
+  transition: width 0.3s;
+}
+
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+  #digital-clock {
+    font-size: 2rem;
+  }
+  .fs-large-text {
+    font-size: 19vw;
+  }
+}

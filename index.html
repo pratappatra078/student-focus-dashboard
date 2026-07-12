@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Focus Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <div class="clock-container">
+        <div>
+          <div id="digital-clock" onclick="toggleFormat()">00:00:00</div>
+          <div id="date-display">Loading...</div>
+        </div>
+        <button
+          class="fs-btn"
+          onclick="openFullscreen('clock-overlay')"
+          title="Full Screen Clock"
+        >
+          ⤢
+        </button>
+      </div>
+      <button class="clock-toggle btn" onclick="toggleFormat()">12/24H</button>
+    </header>
+
+    <div id="clock-overlay" class="fs-overlay">
+      <div id="zen-time" class="fs-large-text">00:00:00</div>
+      <div class="fs-hint">Double-click to exit</div>
+    </div>
+
+    <div id="timer-overlay" class="fs-overlay">
+      <div id="focus-timer-large" class="fs-large-text" style="font-size: 25vw">
+        25:00
+      </div>
+      <div
+        class="fs-hint"
+        style="color: #555; font-style: italic; margin-top: 10px"
+      >
+        "Focus on the process."
+      </div>
+      <div class="fs-hint">Click to Start/Stop • Double-click to Exit</div>
+    </div>
+
+    <div id="stopwatch-overlay" class="fs-overlay">
+      <div id="stopwatch-large" class="fs-large-text" style="font-size: 15vw">
+        00:00.00
+      </div>
+      <div class="fs-hint">Click to Start/Stop • Double-click to Exit</div>
+    </div>
+
+    <div class="container">
+      <section class="card">
+        <div class="card-header">
+          <h2>Study Timer</h2>
+          <button
+            class="fs-btn"
+            onclick="openFullscreen('timer-overlay')"
+            title="Focus Mode"
+          >
+            ⤢
+          </button>
+        </div>
+        <div class="presets">
+          <button class="btn" onclick="setTimer(25)">Pomodoro</button>
+          <button class="btn" onclick="setTimer(50)">Long</button>
+          <button class="btn" onclick="setTimer(5)">Break</button>
+        </div>
+        <div class="timer-display" id="timer-display">25:00</div>
+        <div class="controls">
+          <button
+            class="btn btn-primary"
+            id="timer-start"
+            onclick="toggleTimer()"
+          >
+            Start
+          </button>
+          <button class="btn" onclick="resetTimer()">Reset</button>
+        </div>
+      </section>
+
+      <section class="card" style="grid-row: span 2">
+        <div class="card-header"><h2>Tasks</h2></div>
+        <div class="todo-input-group">
+          <input
+            type="text"
+            id="subject-input"
+            placeholder="Sub"
+            style="width: 30%"
+          />
+          <input type="text" id="task-input" placeholder="New task..." />
+          <button class="btn btn-primary" onclick="addTask()">+</button>
+        </div>
+        <ul class="todo-list" id="todo-list"></ul>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>Stopwatch</h2>
+          <button
+            class="fs-btn"
+            onclick="openFullscreen('stopwatch-overlay')"
+            title="Full Screen Stopwatch"
+          >
+            ⤢
+          </button>
+        </div>
+        <div class="timer-display" id="stopwatch-display">00:00.00</div>
+        <div class="controls">
+          <button
+            class="btn btn-primary"
+            id="sw-start"
+            onclick="toggleStopwatch()"
+          >
+            Start
+          </button>
+          <button class="btn" onclick="recordLap()">Lap</button>
+          <button class="btn btn-danger" onclick="resetStopwatch()">
+            Reset
+          </button>
+        </div>
+        <div class="laps" id="laps-list"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-header"><h2>Quick Notes</h2></div>
+        <textarea
+          id="notes-area"
+          rows="5"
+          placeholder="Auto-saved..."
+        ></textarea>
+        <div
+          style="
+            font-size: 0.8rem;
+            color: #888;
+            text-align: right;
+            margin-top: 5px;
+          "
+          id="save-status"
+        >
+          Saved
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
