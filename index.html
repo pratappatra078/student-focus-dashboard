@@ -388,6 +388,10 @@
             <input type="checkbox" id="set-sound" />
             Play sound when a session ends
           </label>
+          <label class="checkbox">
+            <input type="checkbox" id="set-focuslock" />
+            Lock focus (full screen + warn when you leave)
+          </label>
         </div>
         <div class="dialog-actions">
           <button type="submit" value="cancel" class="btn">Cancel</button>
@@ -406,6 +410,20 @@
         <div class="dialog-actions">
           <button type="submit" value="cancel" class="btn">Cancel</button>
           <button type="submit" value="ok" id="confirm-ok" class="btn btn-danger">Confirm</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Focus lock warning -->
+    <dialog id="focus-warn-dialog" class="dialog" aria-labelledby="focus-warn-title" aria-describedby="focus-warn-message">
+      <form method="dialog" class="dialog-form">
+        <div class="dialog-header">
+          <h3 id="focus-warn-title">Focus Lock</h3>
+        </div>
+        <p id="focus-warn-message"></p>
+        <div class="dialog-actions">
+          <button type="submit" value="quit" id="focus-warn-quit" class="btn btn-danger">Quit Focus</button>
+          <button type="submit" value="stay" id="focus-warn-stay" class="btn btn-primary">Stay Focused</button>
         </div>
       </form>
     </dialog>

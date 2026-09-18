@@ -13,6 +13,7 @@ Student Focus Dashboard is a lightweight, browser-based productivity dashboard b
 - **Stopwatch** — accurate Start / Lap / Reset with a lap history you can clear; the Start button flips to Pause while running
 - **Quick Notes** — larger auto-saving textarea with live character count, "Saved just now" status, Ctrl+S save, and a guarded Clear button
 - **Daily Progress** — focus time, tasks completed, pomodoros, and an overall productivity percentage calculated live from app data
+- **Focus Lock** (optional) — when you start a focus session the app goes full screen automatically, and if you try to switch tabs/windows it stops you with a "You're leaving focus mode" warning (Stay Focused / Quit Focus); closing or leaving the page mid-session also prompts you
 - **Full-screen focus overlays** for the clock, timer, and stopwatch (click to start/pause, double-click to exit)
 - Everything persists in `localStorage` — no backend required
 

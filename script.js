@@ -38,7 +38,7 @@ function formatHMS(sec) {
 /* ============================================================
    Settings
    ============================================================ */
-const DEFAULT_SETTINGS = { pomodoro: 25, short: 5, long: 50, target: 4, autoStart: false, sound: true };
+const DEFAULT_SETTINGS = { pomodoro: 25, short: 5, long: 50, target: 4, autoStart: false, sound: true, focusLock: true };
 const settings = Object.assign({}, DEFAULT_SETTINGS, loadJSON("focusSettings", {}));
 const saveSettings = () => saveJSON("focusSettings", settings);
 
@@ -343,11 +343,26 @@ function stopTimerTicks() {
   }
 }
 
+let autoFullscreen = false;
+
+function exitFocusFullscreen() {
+  if (autoFullscreen && document.fullscreenElement && document.exitFullscreen) {
+    document.exitFullscreen().catch(() => {});
+  }
+  autoFullscreen = false;
+}
+
 function startTimerTicks() {
   stopTimerTicks();
   timer.endAt = Date.now() + timer.remaining * 1000;
   timer.running = true;
   timer.interval = setInterval(tickTimer, 1000);
+  if (timer.mode === "focus" && settings.focusLock && !document.fullscreenElement) {
+    if (document.documentElement.requestFullscreen) {
+      Promise.resolve(document.documentElement.requestFullscreen()).catch(() => {});
+    }
+    autoFullscreen = true;
+  }
   updateTimerDisplay();
 }
 
@@ -410,9 +425,18 @@ function completeTimer() {
     if (settings.sound) playAlarm();
     showToast("Break finished — back to focus!");
   }
+  exitFocusFullscreen();
   setPreset(next);
   updateStats();
   if (settings.autoStart) toggleTimer();
+}
+
+function quitFocusMode() {
+  if (timer.running) stopTimerTicks();
+  timer.running = false;
+  exitFocusFullscreen();
+  updateTimerDisplay();
+  showToast("Focus session cancelled — stay strong next time!");
 }
 
 function playAlarm() {
@@ -814,6 +838,7 @@ function openSettings() {
   $("#set-target").value = settings.target;
   $("#set-autostart").checked = settings.autoStart;
   $("#set-sound").checked = settings.sound;
+  $("#set-focuslock").checked = settings.focusLock;
   settingsDialog.showModal();
 }
 $("#settings-btn").addEventListener("click", openSettings);
@@ -832,6 +857,7 @@ settingsDialog.addEventListener("close", () => {
     settings.target = clampNum("#set-target", 1, 12, 4);
     settings.autoStart = $("#set-autostart").checked;
     settings.sound = $("#set-sound").checked;
+    settings.focusLock = $("#set-focuslock").checked;
     saveSettings();
     if (!timer.running) {
       timer.total = modeSeconds();
@@ -857,6 +883,44 @@ confirmDialog.addEventListener("close", () => {
 });
 
 /* ============================================================
+   Focus lock (full screen + leave warning)
+   ============================================================ */
+const focusWarnDialog = $("#focus-warn-dialog");
+let focusWarnOpen = false;
+let lastLeaveWarn = 0;
+
+function warnFocusLeave() {
+  if (!(settings.focusLock && timer.running && timer.mode === "focus")) return;
+  if (focusWarnOpen || Date.now() - lastLeaveWarn < 3000) return;
+  focusWarnOpen = true;
+  if (settings.sound) playAlarm();
+  focusWarnDialog.showModal();
+}
+
+focusWarnDialog.addEventListener("close", () => {
+  const v = focusWarnDialog.returnValue;
+  focusWarnDialog.returnValue = "";
+  focusWarnOpen = false;
+  if (v === "quit") {
+    quitFocusMode();
+  } else if (v === "stay") {
+    lastLeaveWarn = Date.now();
+    if (timer.running && timer.mode === "focus") showToast("Welcome back — stay focused!");
+  }
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") warnFocusLeave();
+});
+window.addEventListener("blur", warnFocusLeave);
+window.addEventListener("beforeunload", (e) => {
+  if (settings.focusLock && timer.running && timer.mode === "focus") {
+    e.preventDefault();
+    e.returnValue = "";
+  }
+});
+
+/* ============================================================
    Keyboard shortcuts
    ============================================================ */
 document.addEventListener("keydown", (e) => {
@@ -867,7 +931,7 @@ document.addEventListener("keydown", (e) => {
     flashStatus("Saved just now");
     return;
   }
-  if (settingsDialog.open || confirmDialog.open) return;
+  if (settingsDialog.open || confirmDialog.open || focusWarnDialog.open) return;
   const el = e.target || document.body;
   if (el.matches && el.matches("input, textarea, select")) return;
   if (el.isContentEditable) return;
