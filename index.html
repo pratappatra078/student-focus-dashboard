@@ -3,26 +3,106 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0b0d" />
+    <meta name="description" content="A lightweight, distraction-free productivity dashboard for students." />
     <title>Student Focus Dashboard</title>
+    <script>
+      (function () {
+        try {
+          var t = null;
+          try {
+            t = window.localStorage.getItem("focusTheme");
+          } catch (err) {}
+          if (t !== "light" && t !== "dark") {
+            t =
+              window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches
+                ? "light"
+                : "dark";
+          }
+          document.documentElement.dataset.theme = t;
+          var m = document.querySelector('meta[name="theme-color"]');
+          if (m) m.content = t === "light" ? "#eef1f6" : "#0a0b0d";
+        } catch (err) {
+          document.documentElement.dataset.theme = "dark";
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="style.css" />
     <script src="script.js" defer></script>
   </head>
   <body>
-    <header>
-      <div class="clock-container">
-        <div>
-          <div id="digital-clock" onclick="toggleFormat()">00:00:00</div>
-          <div id="date-display">Loading...</div>
-        </div>
+    <header class="app-header">
+      <div class="header-left">
         <button
-          class="fs-btn"
-          onclick="openFullscreen('clock-overlay')"
-          title="Full Screen Clock"
+          type="button"
+          id="digital-clock"
+          class="digital-clock"
+          onclick="toggleFormat()"
+          title="Click to toggle 12/24-hour format"
+          aria-label="Current time. Click to toggle 12/24-hour format."
         >
-          ⤢
+          00:00:00
+        </button>
+        <div id="date-display" class="date-display">Loading&hellip;</div>
+      </div>
+      <div class="header-right">
+        <span id="focus-badge" class="focus-badge">
+          <span class="badge-dot" aria-hidden="true"></span>
+          <span class="badge-text">Focus Mode</span>
+        </span>
+        <button
+          type="button"
+          class="btn btn-ghost"
+          id="clock-fullscreen-btn"
+          onclick="openFullscreen('clock-overlay')"
+          aria-label="Show the real-time clock in full screen"
+        >
+          Full Screen Clock
+        </button>
+        <button
+          type="button"
+          id="clock-toggle"
+          class="btn btn-ghost"
+          onclick="toggleFormat()"
+          aria-label="Switch between 12 and 24 hour clock"
+        >
+          12H
+        </button>
+        <button
+          type="button"
+          id="theme-btn"
+          class="icon-btn"
+          title="Switch to light mode"
+          aria-label="Switch to light mode"
+        >
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+        <button
+          type="button"
+          id="settings-btn"
+          class="icon-btn"
+          title="Settings"
+          aria-label="Open settings"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
         </button>
       </div>
-      <button class="clock-toggle btn" onclick="toggleFormat()">12/24H</button>
     </header>
 
     <div id="clock-overlay" class="fs-overlay">
@@ -31,120 +111,303 @@
     </div>
 
     <div id="timer-overlay" class="fs-overlay">
-      <div id="focus-timer-large" class="fs-large-text" style="font-size: 25vw">
-        25:00
-      </div>
-      <div
-        class="fs-hint"
-        style="color: #555; font-style: italic; margin-top: 10px"
-      >
-        "Focus on the process."
-      </div>
-      <div class="fs-hint">Click to Start/Stop • Double-click to Exit</div>
+      <div id="focus-timer-mode" class="fs-mode-label">FOCUS</div>
+      <div id="focus-timer-large" class="fs-large-text">25:00</div>
+      <div id="focus-session-note" class="fs-mode-note">Session 1 of 4</div>
+      <div class="fs-hint">Click to Start/Pause &bull; Double-click to Exit</div>
     </div>
 
     <div id="stopwatch-overlay" class="fs-overlay">
-      <div id="stopwatch-large" class="fs-large-text" style="font-size: 15vw">
-        00:00.00
-      </div>
-      <div class="fs-hint">Click to Start/Stop • Double-click to Exit</div>
+      <div id="stopwatch-large" class="fs-large-text">00:00.00</div>
+      <div class="fs-hint">Click to Start/Pause &bull; Double-click to Exit</div>
     </div>
 
-    <div class="container">
-      <section class="card">
+    <main class="container">
+      <!-- Study Timer -->
+      <section class="card card-timer" id="timer-card" aria-labelledby="timer-title" data-mode="focus">
         <div class="card-header">
-          <h2>Study Timer</h2>
+          <h2 id="timer-title">Study Timer</h2>
           <button
-            class="fs-btn"
+            type="button"
+            class="icon-btn"
             onclick="openFullscreen('timer-overlay')"
-            title="Focus Mode"
+            title="Full-screen focus mode"
+            aria-label="Open the timer in full screen"
           >
-            ⤢
+            &nearr;
           </button>
         </div>
-        <div class="presets">
-          <button class="btn" onclick="setTimer(25)">Pomodoro</button>
-          <button class="btn" onclick="setTimer(50)">Long</button>
-          <button class="btn" onclick="setTimer(5)">Break</button>
+
+        <div class="presets" role="group" aria-label="Study timer presets">
+          <button type="button" class="preset active" data-mode="focus" onclick="setPreset('focus')">
+            Pomodoro
+          </button>
+          <button type="button" class="preset" data-mode="long" onclick="setPreset('long')">
+            Long
+          </button>
+          <button type="button" class="preset" data-mode="short" onclick="setPreset('short')">
+            Break
+          </button>
         </div>
-        <div class="timer-display" id="timer-display">25:00</div>
+
+        <div class="timer-circle" id="timer-circle" role="group" aria-label="Focus timer, 25 minutes 0 seconds remaining">
+          <svg class="timer-ring" viewBox="0 0 140 140" aria-hidden="true">
+            <circle class="ring-track" cx="70" cy="70" r="62"></circle>
+            <circle class="ring-fill" id="timer-ring-fill" cx="70" cy="70" r="62"></circle>
+          </svg>
+          <div class="timer-copy">
+            <div class="mode-label" id="timer-mode">FOCUS</div>
+            <div class="time-big" id="timer-display" aria-hidden="true">25:00</div>
+            <div class="session-label" id="session-count">Session 1 of 4</div>
+          </div>
+        </div>
+
         <div class="controls">
-          <button
-            class="btn btn-primary"
-            id="timer-start"
-            onclick="toggleTimer()"
-          >
+          <button type="button" class="btn btn-primary" id="timer-start" onclick="toggleTimer()">
             Start
           </button>
-          <button class="btn" onclick="resetTimer()">Reset</button>
+          <button type="button" class="btn" onclick="resetTimer()">Reset</button>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-item">
+            <span class="dot dot-focus" aria-hidden="true"></span>
+            <span>Today's focus:</span>
+            <strong id="timer-today-focus">0s</strong>
+          </span>
         </div>
       </section>
 
-      <section class="card" style="grid-row: span 2">
-        <div class="card-header"><h2>Tasks</h2></div>
-        <div class="todo-input-group">
+      <!-- Tasks -->
+      <section class="card card-tasks" aria-labelledby="tasks-title">
+        <div class="card-header">
+          <h2 id="tasks-title">Tasks</h2>
+          <span class="count-pill" id="task-progress-label" aria-live="polite">0 / 0 tasks</span>
+        </div>
+
+        <div class="todo-add" role="group" aria-label="Add a new task">
           <input
             type="text"
             id="subject-input"
-            placeholder="Sub"
-            style="width: 30%"
+            class="todo-subject"
+            list="subject-options"
+            placeholder="Subject"
+            maxlength="20"
+            aria-label="Task subject (optional)"
+            autocomplete="off"
           />
-          <input type="text" id="task-input" placeholder="New task..." />
-          <button class="btn btn-primary" onclick="addTask()">+</button>
+          <datalist id="subject-options">
+            <option value="DSA"></option>
+            <option value="DBMS"></option>
+            <option value="Python"></option>
+            <option value="College"></option>
+            <option value="Personal"></option>
+          </datalist>
+          <input
+            type="text"
+            id="task-input"
+            placeholder="Add a task, press Enter"
+            maxlength="300"
+            aria-label="Task description"
+            autocomplete="off"
+          />
+          <select id="priority-input" aria-label="Task priority">
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+            <option value="low">Low</option>
+          </select>
+          <button type="button" class="btn btn-primary" id="add-task-btn" aria-label="Add task">
+            +
+          </button>
         </div>
-        <ul class="todo-list" id="todo-list"></ul>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill"></div>
+
+        <div class="task-filters" role="group" aria-label="Filter tasks">
+          <button type="button" class="filter-btn active" data-filter="all">All</button>
+          <button type="button" class="filter-btn" data-filter="active">Active</button>
+          <button type="button" class="filter-btn" data-filter="completed">Completed</button>
+        </div>
+
+        <ul class="todo-list" id="todo-list" aria-label="Task list"></ul>
+
+        <div class="task-progress">
+          <div
+            class="progress-track"
+            role="progressbar"
+            id="task-progress-bar"
+            aria-label="Task completion progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
+            <div class="progress-fill" id="task-progress-fill"></div>
+          </div>
         </div>
       </section>
 
-      <section class="card">
+      <!-- Stopwatch -->
+      <section class="card card-stopwatch" aria-labelledby="sw-title">
         <div class="card-header">
-          <h2>Stopwatch</h2>
+          <h2 id="sw-title">Stopwatch</h2>
           <button
-            class="fs-btn"
+            type="button"
+            class="icon-btn"
             onclick="openFullscreen('stopwatch-overlay')"
-            title="Full Screen Stopwatch"
+            title="Full-screen stopwatch"
+            aria-label="Open the stopwatch in full screen"
           >
-            ⤢
+            &nearr;
           </button>
         </div>
-        <div class="timer-display" id="stopwatch-display">00:00.00</div>
+
+        <div class="time-big time-stopwatch" id="stopwatch-display" aria-label="Stopwatch time">
+          00:00.00
+        </div>
+
         <div class="controls">
-          <button
-            class="btn btn-primary"
-            id="sw-start"
-            onclick="toggleStopwatch()"
-          >
+          <button type="button" class="btn btn-primary" id="sw-start" onclick="toggleStopwatch()">
             Start
           </button>
-          <button class="btn" onclick="recordLap()">Lap</button>
-          <button class="btn btn-danger" onclick="resetStopwatch()">
-            Reset
+          <button type="button" class="btn" id="sw-lap" onclick="recordLap()">Lap</button>
+          <button type="button" class="btn btn-danger" id="sw-reset" onclick="resetStopwatch()">Reset</button>
+        </div>
+
+        <div class="laps-header">
+          <span id="laps-title">Laps</span>
+          <button type="button" class="link-btn" id="clear-laps" onclick="clearLaps()" disabled>
+            Clear
           </button>
         </div>
-        <div class="laps" id="laps-list"></div>
+        <div class="laps" id="laps-list" aria-label="Lap history" aria-describedby="laps-title"></div>
       </section>
 
-      <section class="card">
-        <div class="card-header"><h2>Quick Notes</h2></div>
+      <!-- Quick Notes -->
+      <section class="card card-notes" aria-labelledby="notes-title">
+        <div class="card-header">
+          <h2 id="notes-title">Quick Notes</h2>
+          <div class="notes-meta">
+            <span id="note-count" class="note-count">0 chars</span>
+            <button type="button" class="link-btn" id="notes-clear" onclick="clearNotes()">
+              Clear
+            </button>
+          </div>
+        </div>
         <textarea
           id="notes-area"
-          rows="5"
-          placeholder="Auto-saved..."
+          rows="8"
+          placeholder="Write anything &mdash; auto-saved as you type&hellip;"
+          aria-label="Quick notes (auto-saved)"
         ></textarea>
-        <div
-          style="
-            font-size: 0.8rem;
-            color: #888;
-            text-align: right;
-            margin-top: 5px;
-          "
-          id="save-status"
-        >
-          Saved
+        <div class="note-footer">
+          <span id="note-status" class="note-status" aria-live="polite">Saved just now</span>
+          <span class="note-hint"><span aria-hidden="true">Tip:</span> Press <kbd>Ctrl</kbd>+<kbd>S</kbd> to save</span>
         </div>
       </section>
-    </div>
+
+      <!-- Daily Progress -->
+      <section class="card card-daily" aria-labelledby="daily-title">
+        <div class="card-header">
+          <h2 id="daily-title">Today's Progress</h2>
+        </div>
+        <dl class="daily-stats">
+          <div class="daily-row">
+            <dt>Focus Time</dt>
+            <dd id="total-focus">0s</dd>
+          </div>
+          <div class="daily-row">
+            <dt>Tasks</dt>
+            <dd id="tasks-count">0 / 0</dd>
+          </div>
+          <div class="daily-row">
+            <dt>Pomodoros</dt>
+            <dd id="pomodoros-count">0</dd>
+          </div>
+          <div class="daily-row">
+            <dt>Progress</dt>
+            <dd id="progress-pct">0%</dd>
+          </div>
+        </dl>
+        <div
+          class="progress-track"
+          role="progressbar"
+          id="daily-progress-bar"
+          aria-label="Daily productivity"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+        >
+          <div class="progress-fill" id="daily-progress-fill"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="shortcuts-hint" aria-label="Keyboard shortcuts">
+      <span><kbd>Space</kbd> Start / Pause timer</span>
+      <span><kbd>R</kbd> Reset timer</span>
+      <span><kbd>N</kbd> New task</span>
+      <span><kbd>Ctrl</kbd>+<kbd>S</kbd> Save notes</span>
+    </footer>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- Settings dialog -->
+    <dialog id="settings-dialog" class="dialog" aria-labelledby="settings-title">
+      <form method="dialog" class="dialog-form">
+        <div class="dialog-header">
+          <h3 id="settings-title">Settings</h3>
+          <button
+            type="button"
+            class="icon-btn"
+            onclick="document.getElementById('settings-dialog').close('cancel')"
+            aria-label="Close settings"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="settings-grid">
+          <label class="field">
+            <span>Pomodoro (min)</span>
+            <input type="number" id="set-pomodoro" min="1" max="180" value="25" required />
+          </label>
+          <label class="field">
+            <span>Short break (min)</span>
+            <input type="number" id="set-short" min="1" max="120" value="5" required />
+          </label>
+          <label class="field">
+            <span>Long break (min)</span>
+            <input type="number" id="set-long" min="1" max="180" value="50" required />
+          </label>
+          <label class="field">
+            <span>Sessions / cycle</span>
+            <input type="number" id="set-target" min="1" max="12" value="4" required />
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="set-autostart" />
+            Auto-start next session
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="set-sound" />
+            Play sound when a session ends
+          </label>
+        </div>
+        <div class="dialog-actions">
+          <button type="submit" value="cancel" class="btn">Cancel</button>
+          <button type="submit" value="save" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Confirm dialog -->
+    <dialog id="confirm-dialog" class="dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+      <form method="dialog" class="dialog-form">
+        <div class="dialog-header">
+          <h3 id="confirm-title">Confirm</h3>
+        </div>
+        <p id="confirm-message"></p>
+        <div class="dialog-actions">
+          <button type="submit" value="cancel" class="btn">Cancel</button>
+          <button type="submit" value="ok" id="confirm-ok" class="btn btn-danger">Confirm</button>
+        </div>
+      </form>
+    </dialog>
   </body>
 </html>
