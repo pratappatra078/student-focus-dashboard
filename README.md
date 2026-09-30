@@ -1,6 +1,7 @@
 # Student Focus Dashboard
 
 ![Student Focus Dashboard screenshot](student-focus-dashboard.png)
+![night mode](student-focus-dashboard-night.png)
 
 Student Focus Dashboard is a lightweight, browser-based productivity dashboard built for studying and focus sessions. It combines a live clock, Pomodoro-style timer, task manager, stopwatch, quick notes, and a daily progress summary in one clean, dark interface.
 
